@@ -1,0 +1,4 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define AK_WWISE_PLUGIN_GUI_WINDOWS_BEGIN_POPULATE_TABLE(theName) AK::Wwise::Plugin::PopulateTableItem theName[] = {
