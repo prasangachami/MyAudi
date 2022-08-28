@@ -27,6 +27,7 @@ the specific language governing permissions and limitations under the License.
 #include "MyAudiPlugin.h"
 #include "resource.h"
 #include "../SoundEnginePlugin/MyAudiFXFactory.h"
+
 #include <AK/Tools/Common/AkAssert.h>
 
 MyAudiPlugin::MyAudiPlugin() 
