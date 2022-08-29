@@ -41,7 +41,7 @@ MyAudiPlugin::~MyAudiPlugin()
 
 bool MyAudiPlugin::GetBankParameters(const GUID & in_guidPlatform, AK::Wwise::Plugin::DataWriter& in_dataWriter) const
 {
-    // Write bank data here
+    // Write bank data here 11
     in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, "Placeholder"));
 
     return true;
