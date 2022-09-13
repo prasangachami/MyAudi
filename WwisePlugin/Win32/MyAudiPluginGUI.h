@@ -6,10 +6,18 @@
 class MyAudiPluginGUI final
 	: public AK::Wwise::Plugin::PluginMFCWindows<>
 	, public AK::Wwise::Plugin::GUIWindows
+	, public AK::Wwise::Plugin::RequestHost
+	, public AK::Wwise::Plugin::RequestPropertySet
 {
 public:
 	MyAudiPluginGUI();
+
 	HINSTANCE GetResourceHandle() const override;
+
+	virtual void NotifyPropertyChanged(
+		const GUID & in_guidPlatform,
+		const char* in_szPropertyName
+	) override;
 
 	bool GetDialog(
 		AK::Wwise::Plugin::eDialog in_eDialog,
@@ -26,5 +34,8 @@ public:
 		LRESULT& out_iResult
 	) override;
 
-	private: HWND m_hwndPropView = nullptr;
+	private:
+		void EnableFeedback();
+
+		HWND m_hwndPropView = nullptr;
 };

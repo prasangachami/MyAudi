@@ -28,6 +28,7 @@ the specific language governing permissions and limitations under the License.
 #define MyAudiFX_H
 
 #include "MyAudiFXParams.h"
+#include "AkDelayFXDSP.h"
 
 /// See https://www.audiokinetic.com/library/edge/?source=SDK&id=soundengine__plugins__effects.html
 /// for the documentation about effect plug-ins
@@ -35,12 +36,20 @@ class MyAudiFX
     : public AK::IAkInPlaceEffectPlugin
 {
 public:
+    //Constructor
     MyAudiFX();
+
+    //Destructor
     ~MyAudiFX();
 
     /// Plug-in initialization.
     /// Prepares the plug-in for data processing, allocates memory and sets up the initial conditions.
-    AKRESULT Init(AK::IAkPluginMemAlloc* in_pAllocator, AK::IAkEffectPluginContext* in_pContext, AK::IAkPluginParam* in_pParams, AkAudioFormat& in_rFormat) override;
+    AKRESULT Init(
+        AK::IAkPluginMemAlloc* in_pAllocator, 
+        AK::IAkEffectPluginContext* in_pContext, 
+        AK::IAkPluginParam* in_pParams, 
+        AkAudioFormat& in_rFormat
+    ) override;
 
     /// Release the resources upon termination of the plug-in.
     AKRESULT Term(AK::IAkPluginMemAlloc* in_pAllocator) override;
@@ -65,6 +74,7 @@ private:
     MyAudiFXParams* m_pParams;
     AK::IAkPluginMemAlloc* m_pAllocator;
     AK::IAkEffectPluginContext* m_pContext;
+    CAkDelayFXDSP			m_FXState;		/// Internal effect state
 };
 
 #endif // MyAudiFX_H

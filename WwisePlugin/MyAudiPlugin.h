@@ -28,6 +28,14 @@ the specific language governing permissions and limitations under the License.
 
 #include <AK/Wwise/Plugin.h>
 
+extern const char* const szDelayTime;
+extern const char* const szFeedbackEnabled;
+extern const char* const szFeedback;
+extern const char* const szWetDryMix;
+extern const char* const szOutputLevel;
+extern const char* const szProcessLFE;
+extern const char* const szPlaceholder;
+
 /// See https://www.audiokinetic.com/library/edge/?source=SDK&id=plugin__dll.html
 /// for the documentation about Authoring plug-ins
 class MyAudiPlugin final
@@ -43,7 +51,7 @@ public:
     bool GetBankParameters(const GUID & in_guidPlatform, AK::Wwise::Plugin::DataWriter& in_dataWriter) const override;
 
     HINSTANCE GetResourceHandle() const;
-    bool GetDialog(AK::Wwise::Plugin::eDialog in_eDialog, UINT& out_uiDialogID, AK::Wwise::Plugin::PopulateTableItem*& out_pTable) const;
+    //bool GetDialog(AK::Wwise::Plugin::eDialog in_eDialog, UINT& out_uiDialogID, AK::Wwise::Plugin::PopulateTableItem*& out_pTable) const;
 };
 
 DECLARE_AUDIOPLUGIN_CONTAINER(MyAudi);	// Exposes our PluginContainer structure that contains the info for our plugin

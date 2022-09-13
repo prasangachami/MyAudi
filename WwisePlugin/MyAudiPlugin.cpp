@@ -31,6 +31,16 @@ the specific language governing permissions and limitations under the License.
 
 #include <AK/Tools/Common/AkAssert.h>
 
+// Delay property names
+const char* const szDelayTime = "DelayTime";
+const char* const szFeedbackEnabled = "FeedbackEnabled";
+const char* const szFeedback = "Feedback";
+const char* const szWetDryMix = "WetDryMix";
+const char* const szOutputLevel = "OutputLevel";
+const char* const szProcessLFE = "ProcessLFE";
+
+const char* const szPlaceholder = "Placeholder";
+
 MyAudiPlugin::MyAudiPlugin() 
 {
 }
@@ -42,24 +52,26 @@ MyAudiPlugin::~MyAudiPlugin()
 bool MyAudiPlugin::GetBankParameters(const GUID & in_guidPlatform, AK::Wwise::Plugin::DataWriter& in_dataWriter) const
 {
     // Write bank data here 11
-    in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, "Placeholder"));
+    in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, szPlaceholder));
+
+    // Pack parameters in bank
+    // IMPORTANT NOTE: they need to be written and read on the AudioEngine side in the same order
+    in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, szDelayTime));
+    in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, szFeedback));
+    in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, szWetDryMix));
+    in_dataWriter.WriteReal32(m_propertySet.GetReal32(in_guidPlatform, szOutputLevel));
+    in_dataWriter.WriteBool(m_propertySet.GetBool(in_guidPlatform, szFeedbackEnabled));
+    in_dataWriter.WriteBool(m_propertySet.GetBool(in_guidPlatform, szProcessLFE));
 
     return true;
 }
-
-AK_WWISE_PLUGIN_GUI_WINDOWS_BEGIN_POPULATE_TABLE(MyAudiProperties)
-AK_WWISE_PLUGIN_GUI_WINDOWS_POP_ITEM(
-    IDC_GAIN_SLIDER,
-    "Placeholder"
-    )
-
-AK_WWISE_PLUGIN_GUI_WINDOWS_END_POPULATE_TABLE()
 
 HINSTANCE MyAudiPlugin::GetResourceHandle() const
 {
     return HINSTANCE();
 }
 
+/*
 bool MyAudiPlugin::GetDialog(
     AK::Wwise::Plugin::eDialog in_eDialog,
     UINT& out_uiDialogID,
@@ -71,7 +83,7 @@ bool MyAudiPlugin::GetDialog(
     case AK::Wwise::Plugin::eDialog::SettingsDialog:
     {
         out_uiDialogID = IDD_PROPPAGE_LARGE;
-        out_pTable = MyAudiProperties;
+        out_pTable = DelayProp;
         return true;
     }
     case AK::Wwise::Plugin::eDialog::ContentsEditorDialog:
@@ -82,6 +94,8 @@ bool MyAudiPlugin::GetDialog(
     }
 }
 
+*/
+
 
 DEFINE_AUDIOPLUGIN_CONTAINER(MyAudi);											// Create a PluginContainer structure that contains the info for our plugin
 EXPORT_AUDIOPLUGIN_CONTAINER(MyAudi);											// This is a DLL, we want to have a standardized name
@@ -91,5 +105,4 @@ ADD_AUDIOPLUGIN_CLASS_TO_CONTAINER(                                             
     MyAudiFX       // Corresponding Sound Engine plug-in class
 );
 DEFINE_PLUGIN_REGISTER_HOOK
-
 DEFINEDUMMYASSERTHOOK;							// Placeholder assert hook for Wwise plug-ins using AKASSERT (cassert used by default)

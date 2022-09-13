@@ -52,23 +52,38 @@ MyAudiFX::~MyAudiFX()
 {
 }
 
-AKRESULT MyAudiFX::Init(AK::IAkPluginMemAlloc* in_pAllocator, AK::IAkEffectPluginContext* in_pContext, AK::IAkPluginParam* in_pParams, AkAudioFormat& in_rFormat)
+AKRESULT MyAudiFX::Init(
+    AK::IAkPluginMemAlloc* in_pAllocator, 
+    AK::IAkEffectPluginContext* in_pContext, 
+    AK::IAkPluginParam* in_pParams, 
+    AkAudioFormat& in_rFormat
+)
 {
     m_pParams = (MyAudiFXParams*)in_pParams;
     m_pAllocator = in_pAllocator;
     m_pContext = in_pContext;
+
+    m_FXState.Setup(m_pParams, in_rFormat.uSampleRate);
+    AKRESULT eResult = m_FXState.InitDelay(in_pAllocator, m_pParams, in_rFormat.channelConfig);
+    m_FXState.ComputeTailLength(m_pParams->RTPC.bFeedbackEnabled, m_pParams->RTPC.fFeedback);
+    m_pParams->NonRTPC.bHasChanged = false;
+    m_pParams->RTPC.bHasChanged = false;
+
+    AK_PERF_RECORDING_RESET();
 
     return AK_Success;
 }
 
 AKRESULT MyAudiFX::Term(AK::IAkPluginMemAlloc* in_pAllocator)
 {
+    m_FXState.TermDelay(in_pAllocator);
     AK_PLUGIN_DELETE(in_pAllocator, this);
     return AK_Success;
 }
 
 AKRESULT MyAudiFX::Reset()
 {
+    m_FXState.ResetDelay();
     return AK_Success;
 }
 
@@ -82,6 +97,7 @@ AKRESULT MyAudiFX::GetPluginInfo(AkPluginInfo& out_rPluginInfo)
 
 }
 
+/*
 void MyAudiFX::Execute(AkAudioBuffer* io_pBuffer)
 {
     const AkUInt32 uNumChannels = io_pBuffer->NumChannels();
@@ -100,6 +116,34 @@ void MyAudiFX::Execute(AkAudioBuffer* io_pBuffer)
         }
     }
 }
+*/
+
+/// Effect plug-in DSP processing
+void MyAudiFX::Execute(AkAudioBuffer* io_pBuffer)
+{
+    if (AK_EXPECT_FALSE(m_pParams->NonRTPC.bHasChanged))
+    {
+        AKRESULT eResult = m_FXState.InitDelay(m_pAllocator, m_pParams, io_pBuffer->GetChannelConfig());
+        if (eResult != AK_Success)
+            return; // passthrough
+        m_FXState.ResetDelay();
+        m_pParams->NonRTPC.bHasChanged = false;
+    }
+
+    if (AK_EXPECT_FALSE(m_pParams->RTPC.bHasChanged))
+    {
+        m_FXState.ComputeTailLength(m_pParams->RTPC.bFeedbackEnabled, m_pParams->RTPC.fFeedback);
+        m_pParams->RTPC.bHasChanged = false;
+    }
+
+    AK_PERF_RECORDING_START("Delay", 25, 30);
+    // Execute DSP processing synchronously here
+    m_FXState.Process(io_pBuffer, m_pParams);
+    AK_PERF_RECORDING_STOP("Delay", 25, 30);
+}
+
+
+
 
 AKRESULT MyAudiFX::TimeSkip(AkUInt32 in_uFrames)
 {

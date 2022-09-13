@@ -35,13 +35,42 @@ the specific language governing permissions and limitations under the License.
 static const AkPluginParamID PARAM_PLACEHOLDER_ID = 0;
 static const AkUInt32 NUM_PARAMS = 1;
 
+// Parameters IDs for the Wwise or RTPC.
+// Those IDs map to the AudioEnginePropertyID attributes in the XML property definition
+static const AkPluginParamID AK_DELAYFXPARAM_DELAYTIME_ID = 2;
+static const AkPluginParamID AK_DELAYFXPARAM_FEEDBACK_ID = 3;	// RTPC
+static const AkPluginParamID AK_DELAYFXPARAM_WETDRYMIX_ID = 4;	// RTPC
+static const AkPluginParamID AK_DELAYFXPARAM_OUTPUTGAIN_ID = 5;	// RTPC
+static const AkPluginParamID AK_DELAYFXPARAM_FEEDBACKENABLED_ID = 6;	// RTPC
+static const AkPluginParamID AK_DELAYFXPARAM_PROCESSLFE_ID = 7;
+
+static const AkPluginParamID AK_DELAYFXPARAM_NUM = 8;
+
+// Default parameter values
+#define DELAYFXPARAM_DELAYTIME_DEF			(0.5f)		// secs
+#define DELAYFXPARAM_FEEDBACK_DEF			(0.f)		// Percent
+#define DELAYFXPARAM_WETDRYMIX_DEF			(50.f)		// Percent
+#define DELAYFXPARAM_OUTPUTLEVEL_DEF		(0.f)		// dBFS
+#define DELAYFXPARAM_FEEDBACKENABLED_DEF	(false)		// Disabled
+#define DELAYFXPARAM_PROCESSLFE_DEF			(true)
+
+static const AkReal32 ONEOVER_DELAYFXPARAM_PERCENT_MAX = 0.01f;
+
 struct MyAudiRTPCParams
 {
     AkReal32 fPlaceholder;
+    AkReal32	fFeedback;
+    AkReal32	fWetDryMix;
+    AkReal32	fOutputLevel;
+    bool		bFeedbackEnabled;
+    bool		bHasChanged;
 };
 
 struct MyAudiNonRTPCParams
 {
+    AkReal32	fDelayTime;
+    bool		bProcessLFE;
+    bool		bHasChanged;
 };
 
 struct MyAudiFXParams
